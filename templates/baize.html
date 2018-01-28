@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>BaizeNLP</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/flat-ui/2.3.0/css/flat-ui.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/flat-ui/2.3.0/js/flat-ui.min.js"></script>
+    <script src="https://cdn.bootcss.com/d3/4.7.1/d3.min.js"></script>
+
+    <style>
+
+        .links line {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+
+        .nodes circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="container" id="main">
+    <div class="row">
+        <div class="col-md-12">
+            <h4 style="align-content: center;">
+                BaizeNLP Web Demo
+            </h4>
+
+            <p>BaizeNLP: <a href="https://github.com/lujiaying/BaizeNLP">github</a></p>
+            <hr/>
+        </div>
+    </div>
+    
+    
+    <div class="row">
+        <div class="col-md-12"></div>
+    </div>
+    <div class="row" style="width: 100%;margin-top: 20px">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="row">
+                <h6>
+                    新词发现:
+                </h6>
+                <span><a href="http://lujiaying.github.io/2018/01/28/%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF%E7%9A%84%E6%96%B0%E8%AF%8D%E6%8C%96%E6%8E%98%E5%AE%9E%E8%B7%B5/">算法原理</a></span>
+                <br />
+                <span>输入一段文本(长文本效果更佳)，以无监督、无知识的方式发现新词</span>
+                <hr/>
+            </div>
+            <div class="row">
+                <div class="tagsinput-primary">
+                    <textarea class="form-control" id="word_discovery_input" rows="8" placeholder="Please input text"></textarea>
+                    结果数(响应时间与结果数成正比): <input type="number" id="word_discovery_cnt" value=10 style="margin: 10px">
+                    <br />
+                    单词最大长度(响应时间与最大长度成正比): <input type="number" id="word_max_len" value=4 style="margin: 10px">
+                </div>
+                <button class="btn btn-info" id="word_discovery_send" style=" width: 100%;">确认</button>
+                <hr/>
+            </div>
+            <div class="row table-responsive">
+                <span>新词发现的结果：</span>
+                <table class="table" id="ret_word_discovery_res">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>New Word</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+</body>
+
+<script>
+$(document).ready(function(){
+    $("#word_discovery_send").click(function() {
+        $.post('word_discovery/',
+            {
+                text: $("#word_discovery_input").val(),
+                res_cnt: $("#word_discovery_cnt").val(),
+                max_len: $("#word_max_len").val()
+            },
+            function(data, status) {
+                //console.log(data);
+                $("#ret_word_discovery_res tbody").html("");
+                for (var i=0; i<data.res_cnt; i++) {
+                    //console.log(data.movie_topk_like[i]);
+                    var row_str = "<tr><th>"+(i+1)+"</th><td>"+data.new_words[i]+"</td></tr>"
+                    //console.log(row_str);
+                    $("#ret_word_discovery_res tbody").append(row_str);
+                }
+                // for empty response
+                if (data.res_cnt == 0) {
+                    var row_str = "<tr><th>0</th><td>"+data.message+"</td></tr>"
+                    $("#ret_word_discovery_res tbody").append(row_str);
+                }
+        });
+    });
+});
+</script>
+</html>
